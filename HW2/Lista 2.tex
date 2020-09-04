@@ -1,0 +1,241 @@
+\documentclass[12pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsfonts}
+\usepackage[margin=2.5cm]{geometry}
+\usepackage{listings}
+\usepackage{dsfont}
+\usepackage[svgnames]{xcolor}
+
+\lstset{language=R,
+	showspaces=false,
+	showstringspaces=false,
+	showtabs=false,
+	keywordstyle=\color{NavyBlue},
+	commentstyle=\color{YellowGreen},
+	stringstyle=\color{Crimson}
+}
+
+\setlength{\jot}{1.5ex}
+
+\title{Lista 2 de Finanças Quantitativas\\
+Diogo Wolff Surdi}
+
+\begin{document}
+\maketitle
+
+\section*{Questão 1}
+
+A distribuição da GPD é:
+
+\begin{equation*}
+\mathbb{P}(X \leq x)= \begin{cases}
+1-(1+\xi\frac{x-\mu}{\sigma})^{-\frac{1}{\xi}}, \; \xi \neq 0\\
+1-exp(-\frac{x-\mu}{\sigma}), \; \xi =0
+\end{cases}
+\end{equation*}
+Note que $F_{\mu,\sigma,\xi}(x)$, a c.d.f. da GPD, equivale a $\mu+\sigma X$, onde $X\sim Pareto(\frac{1}{\xi})$. Sabemos que a esperança de uma distribuição de Pareto é $\frac{\alpha}{\alpha-1}$. Com isso, temos que:
+\begin{equation*}
+\mathbb{E}[\mu+\sigma X]=\mu +\sigma \mathbb{E}[X]=\mu + \sigma \frac{\frac{1}{\xi}}{\frac{1}{\xi}-1}=\mu+\frac{\sigma}{1-\xi}
+\end{equation*}
+A mean excess function é $e(l)=\mathbb{E}[X-l|X\:\textgreater \;l]$. Temos então que:
+\begin{equation*}
+e(l)=\frac{\mathbb{E}[(X-l)\mathds{1}_{X\:\textgreater \;l}]}{\mathbb{P}(X\:\textgreater \;l)}=
+\frac{\int_{x}^{\infty}{1-F(u)}du}{1-F_{x}}=\frac{\sigma+\xi(u-\mu)}{\xi-1}
+\end{equation*}
+Essa função é linear em $u$, como esperado.
+
+\section*{Questão 2.2}
+
+\subsection*{1.1}
+\begin{equation*}
+X \sim Pareto(\frac{1}{\xi}) \Rightarrow F_{X}=
+\begin{cases}
+	1-(1+\xi x)^{-\frac{1}{\xi}}\; se\; x\:\textgreater \;0\\
+	0 \; c.c.
+\end{cases}
+\end{equation*}
+\subsection*{1.2}
+$Q=F^{-1}$. Com isso, temos que:
+\begin{equation*}
+1-(1+\xi Q)^{-\frac{1}{\xi}}=p \Longrightarrow Q=\frac{(1-p)^{-\xi}-1}{\xi}
+\end{equation*}
+\subsection*{1.3}
+Para gerar amostras de $F$, basta-se tomar valores de $Q(U)$.
+\subsection*{2}
+Para essa distribuição, a probabilidade de se estar em um intervalo é a probabilidade de ele ocorrer em cada distribuição, dado que foi escolhida alguma delas, multiplicada pela probabilidade de se escolher tal distribuição. Com isso, $f_{y}$ é combinação linear das duas distribuições.
+\begin{equation*}
+f_{y}(y)=\frac{1}{3}\frac{e^{-\frac{y}{2}}}{2}-
+\frac{2}{3}\left(1+\frac{y}{2}\right)^{-3}
+\end{equation*}
+\subsection*{3}
+O processo seria o mesmo do item anterior, gerando a CDF de $y$, encontrando sua inversa e então utilizando $F_{y}^{-1}(U)$.
+
+\section*{Questão 2.3}
+\subsection*{1.1}
+\begin{equation*}
+F_{L}(x)=\begin{cases}
+	0 & x\;\textless \;0\\
+	1-e^{-rx} & x\geq 0
+\end{cases}
+\end{equation*}
+Basicamente, o valor da perda é 0 para um retorno não-negativo, e tem a distribuição dada pela questão para retornos negativos.
+
+\subsection*{1.2}
+
+\section*{Questão 2.4}
+\subsection*{1}
+O arquivo PCS tem 381 observações, logo geraremos 1905 amostras. Devo observar que o R não estava encontrando a função rpareto, então tive que instalar outro pacote (gPdtest) para gerar as amostras. Esse pacote gera amostras sem o fator de localização m, então somei a estimação dele na amostra.
+
+\begin{lstlisting}[language=R]
+library(Rsafd)
+library(gPdtest)
+PCS.index <- PCS[,2]
+PCS.lmom <- gpd.lmom(PCS.index)$param.est
+
+> PCS.lmom
+m     lambda         xi 
+0.06824332 0.66804349 0.71179240 
+
+PCS.rlmom <- rgp(n=1905, shape=PCS.lmom[3], scale=PCS.lmom[2])
+m=PCS.lmom[1]
+samplelmom <- PCS.rlmom + m
+
+> head(sample)
+[1] 0.3949272 0.8675918 0.4172077 0.6950772 0.7066541 5.0894675
+\end{lstlisting}
+
+Acima gerei a amostra com o método de L-momentos. Também irei gerar a amostra com o método de máxima verossimilhança:
+
+\begin{lstlisting}[language=R]
+PCS.ml <- gpd.ml(PCS.index)$param.est
+
+> PCS.ml
+m    lambda        xi 
+0.0700000 0.7130693 0.6335170 
+
+PCS.rml <- rgp(n=1905, shape=PCS.ml[3], scale=PCS.ml[2])
+m2=PCS.ml[1]
+sampleml <- PCS.ml+m2
+
+> head(sampleml)
+[1] 0.2020278 3.0497405 0.8195610 0.3338650 0.8188285 2.0959607
+\end{lstlisting}
+
+\subsection*{2}
+Nesse item, vou plotar os QQ-plots de ambos os métodos, e tentar ver se algum deles é melhor.
+
+\begin{lstlisting}[language=R]
+par(mfrow=c(1,2))
+
+qqplot(samplelmom, PCS.index)+abline(0,1, col='red')
+qqplot(sampleml, PCS.index)+abline(0,1, col='red')
+\end{lstlisting}
+
+\begin{center}
+	\includegraphics*[scale=0.7]{2.png}
+\end{center}
+
+Como pode-se ver, ambos têm problemas na estimação para os últimos quantis.
+
+\subsection*{3}
+\begin{lstlisting}[language=R]
+> ks.test(samplelmom, PCS.index)
+
+Two-sample Kolmogorov-Smirnov test
+
+data:  samplelmom and PCS.index
+D = 0.071391, p-value = 0.07861
+alternative hypothesis: two-sided
+\end{lstlisting}
+
+\section*{Questão 2.6}
+
+\subsection*{1}
+\begin{lstlisting}[language=R]
+DSPLRet <- diff(log(DSP))
+
+> head(DSPLRet)
+[1]  0.007980092 -0.004314643 -0.007344383 -0.003188190 -0.012344792
+ -0.006144413
+\end{lstlisting}
+
+\subsection*{2}
+\begin{lstlisting}[language=R]
+MSPLRet <- diff(log(MSP))
+
+> head(MSPLRet)
+[1] -0.0016680571  0.0002782028  0.0009267841  0.0004630702  0.0000000000  0.0011104943
+\end{lstlisting}
+
+\subsection*{3}
+
+\begin{lstlisting}[language=R]
+qqplot(DSPLRet, MSPLRet)+abline(0,1)
+\end{lstlisting}
+
+\includegraphics*{3.png}
+
+Pelo formato do Q-Q plot, os retornos diários aparentam ter caudas mais pesadas do que os retornos minuto a minuto.
+
+\subsection*{4}
+
+\begin{lstlisting}[language=R]
+> mean(DSPLRet)
+[1] 0.0002717871
+
+> var(DSPLRet)
+[1] 8.418932e-05
+
+> mean(MSPLRet)
+[1] 2.446315e-05
+
+> var(MSPLRet)
+[1] 2.4412e-07
+\end{lstlisting}
+
+Os valores esperados são parecidos, porém a variância dos retornos diários é muito maior, logo eles provavelmente não vêm da mesma distribuição.
+
+\subsection*{5}
+Novamente, o R não está reconhecendo a função fit.gpd do pacote Rsafd. Vou utilizar a função fit.gpd do pacote gld.
+
+\begin{lstlisting}[language=R]
+> fit.gpd(DSPLRet)
+Region A:
+Estimate    Std. Error
+alpha    0.0005402   0.0001341
+beta     0.0072581   0.0001206
+delta    0.4844521   0.0094871
+lambda  -0.1590021   0.0106103
+
+Region B:
+Estimate    Std. Error
+alpha   -0.0005888   0.0003339
+beta     0.2720552   0.0034761
+delta    0.5112843   0.0036330
+lambda   6.1343819   0.0648509
+
+> fit.gpd(MSPLRet)
+Region A:
+Estimate    Std. Error
+alpha   -1.093e-08   4.942e-05
+beta     6.388e-04   5.300e-05
+delta    5.211e-01   3.873e-02
+lambda   9.971e-02   5.149e-02
+
+Region B:
+Estimate   Std. Error
+alpha   7.162e-05  6.537e-05 
+beta    9.745e-03  6.286e-04 
+delta   4.868e-01  1.707e-02 
+lambda  4.456e+00  2.474e-01 
+\end{lstlisting}
+
+
+
+\end{document}
+
+
+

@@ -1,0 +1,139 @@
+\documentclass[12pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsfonts}
+\usepackage[margin=2.5cm]{geometry}
+\usepackage{listings}
+\usepackage[svgnames]{xcolor}
+
+\lstset{language=R,
+	showspaces=false,
+	showstringspaces=false,
+	showtabs=false,
+	keywordstyle=\color{NavyBlue},
+	commentstyle=\color{YellowGreen},
+	stringstyle=\color{Crimson}
+}
+
+\setlength{\jot}{1.5ex}
+
+\title{Lista 3\\
+Finanças Quantitativas\\
+Diogo Wolff Surdi}
+
+\begin{document}
+\maketitle
+
+\section*{Questão 3.11}
+
+\subsection*{11.1}
+A P.D.F. de uma variável normal (0,1) é:
+\begin{equation*}
+g(y)=\frac{1}{\sqrt{2\pi}}e^{-\frac{y^2}{2}}, \;\;\;\;\;\; -\infty\;\textless \;y\;\textless \;\infty
+\end{equation*}
+Ao tirar seu módulo ('dobrar' ela em 0), temos a P.D.F.:
+\begin{equation*}
+f(x)=\frac{1}{\sqrt{2\pi}}[e^{-\frac{x^2}{2}}+e^{-\frac{x^2}{2}}]=\sqrt{\frac{2}{\pi}}e^{-\frac{x^2}{2}}
+\;\;\;\;\;\; x\geq 0
+\end{equation*}
+Para encontrar o valor esperado, basta calcular a integral
+\begin{equation*}
+\int_{0}^{\infty}\sqrt{\frac{2}{\pi}}xe^{-\frac{x^2}{2}}dx
+\end{equation*}
+Integrando por partes, encontramos então que $\mathbb{E}[|X|]=\sqrt{\frac{2}{\pi}}$.
+
+\subsection*{11.2}
+Para o valor esperado, basta notar que, em valor esperado, o termo entre parênteses se cancela, tornando a equação inteira 0. Para a variância, é preciso calcular a variância de $|X|$. Resolvendo a integral definida
+\begin{equation*}
+\int_{0}^{\infty}\sqrt{\frac{2}{\pi}}x^2e^{-\frac{x^2}{2}}dx
+\end{equation*}
+Encontramos $\mathbb{E}[|X|^2]=1$, logo a variância de $|X|$ é $1-\frac{2}{\pi}$. Para a variância de $Y$, basta utilizar algumas propriedades da variância.
+\begin{equation*}
+Var(Y)=\frac{1}{1-\frac{2}{\pi}}Var(|X|)=\frac{1-\frac{2}{\pi}}{1-\frac{2}{\pi}}=1
+\end{equation*}
+Basta mostrar que $Cov(X,Y)=0$. Primeiramente, temos que $\mathbb{E}[X]=0$, logo $Cov(X,Y)=\mathbb{E}[XY]$. Também devido ao valor esperado nulo, temos 
+\begin{equation*}
+\mathbb{E}[XY]=\mathbb{E}\left[\frac{X|X|}{\sqrt{1-\frac{2}{\pi}}}\right]=\frac{1}{\sqrt{1-\frac{2}{\pi}}}\mathbb{E}[X|X|]
+\end{equation*}
+Note que o valor esperado de $\mathbb{E}[X|X|]$ é
+\begin{equation*}
+-\int_{-\infty}^{0}x^2f_{x}dx+\int_{0}^{\infty}x^2f_{x}dx
+\end{equation*}
+Como a normal é simétrica, tais valores se anulam, logo a covariância é 0, e as variáveis não são correlacionadas.
+
+\section*{Questão 3.12}
+
+\subsection*{12.1}
+Temos que a cópula de $X$ e $Y$ é definida por:
+\begin{equation*}
+C(x,y)=\mathbb{P}(X\leq x, Y\leq y )
+\end{equation*}
+Note que $\mathbb{P}(\max(X,Y)\leq t)$ é a probabilidade de cada uma das variáveis seja menor ou igual a $t$, isto é:
+\begin{equation*}
+\mathbb{P}(\max(X,Y)\leq t)=\mathbb{P}(X\leq t,Y\leq t)
+\end{equation*}
+Logo vale a igualdade requisitada.
+
+\subsection*{12.2}
+O evento do mínimo ser menor ou igual a $t$ equivale à união dos eventos de que cada distribuição é menor ou igual a $t$. Com isso, note que 
+\begin{equation*}
+\mathbb{P}(A\cup B)=\mathbb{P}(A)+\mathbb{P}(B)-\mathbb{P}(A\cap B)
+\end{equation*}
+Sabendo que a cópula é a distribuição conjunta, isto é, a distribuição da interseção dos eventos, basta substituir os valores:
+\begin{equation*}
+\mathbb{P}(\min(X,Y)\leq t)=
+F_{X}(t)+F_{Y}(t)-C(F_{X}(t),F_{Y}(t))
+\end{equation*}
+
+\subsection*{Questão 1}
+
+\subsection*{(a)}
+Temos uma partição de uma distribuição normal multivariada, e queremos mostrar que cada termo da partição também é uma normal multivariada. Como os elementos do vetor da partição são elementos do vetor original, e como sabemos que o vetor original é uma normal multivariada, então cada um de seus elementos é uma variável normal. Com isso, qualquer combinação linear de elementos da partição, isto é, qualquer $Y=a^TX_{1}$, é uma combinação linear de variáveis normais, logo é normal, logo $X_{1}$ é uma distribuição normal multivariada.
+
+\subsection*{(b)}
+Sabe-se que a distribuição condicional de uma gaussiana multivariada é também gaussiana. Com isso, basta encontrar sua média e variância.\\
+Seja $Y=X_{1}+KX_{2}$ (onde $K=-\Sigma_{1,2}\Sigma_{2,2}^{-1}$), então, a covariância entre $Y$ e $X_{2}$ é:
+\begin{align*}
+cov(Y,X_{2})&=cov(X_{1},X_{2})+Kcov(X_{2},X_{2})\\
+&=\Sigma_{1,2}+KVar(X_{2})\\
+&=\Sigma_{1,2}-\Sigma_{1,2}\Sigma_{2,2}^{-1}\Sigma_{2,2}\\
+&=0
+\end{align*}
+Assim, as variáveis não são correlacionadas, e, como são parte de uma variável gaussiana conjunta, elas são independentes, logo:
+\begin{align*}
+\mathbb{E}[X_{1}|X_{2}]&=\mathbb{E}[Y-KX_{2}|X_{2}]\\
+&=\mathbb{E}[Y|X_{2}]-KX_{2}\\
+&=\mathbb{E}[Y]-KX_{2}
+\end{align*}
+Pelas propriedades do valor esperado, temos que $\mathbb{E}[Y]=\mathbb{E}[X_{1}]+K\mathbb{E}[X_{2}]=\mu_{1}+K\mu_{2}$. Com isso:
+\begin{equation*}
+\mathbb{E}[X_{1}|X_{2}]=\mu_{1}+K\mu_{2}-KX_{2}=\mu_{1}+\Sigma_{1,2}\Sigma_{2,2}^{-1}(X_{2}-\mu_{2})
+\end{equation*}
+Basta agora calcular a variância condicional de $X_{1}$. Note que
+\begin{align*}
+Var(X_{1}|X_{2})&=Var(Y-KX_{2}|X_{2})\\
+&=Var(Y|X_{2})+Var(AX_{2}|X_{2})-ACov(Y,-X_{2})-Cov(Y,-X_{2})A^T\\
+&=Var(Y|X_{2})\\
+&=Var(Y)
+\end{align*}
+E com isso:
+\begin{align*}
+Var(X_{1}|X_{2})&=Var(X_{1})+AVar(X_{2})A^{T}+ACov(X_{1},X_{2})+Cov(X_{2},X_{1})A^{T}\\
+&=\Sigma_{1,1}+\Sigma_{1,2}\Sigma_{2,2}^{-1}\Sigma_{2,2}\Sigma_{2,2}^{-1}\Sigma_{2,1}-2\Sigma_{1,2}\Sigma_{2,2}^{-1}\Sigma_{2,1}\\
+&=\Sigma_{1,1}+\Sigma_{1,2}\Sigma_{2,2}^{-1}\Sigma_{2,1}-2\Sigma_{1,2}\Sigma_{2,2}^{-1}\Sigma_{2,1}\\
+&=\Sigma_{1,1}-\Sigma_{1,2}\Sigma_{2,2}^{-1}\Sigma_{2,1}
+\end{align*}
+
+\section*{Questão 2}
+
+\subsection*{(a)}
+
+\subsection*{(b)}
+Para $\theta=1$, temos que a fórmula da cópula é igual a $uv$, logo as variáveis são independentes. Para  $\theta \rightarrow \infty$, a fórmula se torna $\min{u,v}$, logo há dependência completa.
+
+\end{document}
+
+
+
